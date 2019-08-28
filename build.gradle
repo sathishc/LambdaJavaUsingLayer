@@ -1,0 +1,33 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile (
+        'com.amazonaws:aws-lambda-java-core:1.2.0',
+        'com.amazonaws:aws-lambda-java-events:2.2.6',
+        'com.amazonaws:aws-lambda-java-log4j:1.0.0',
+        'com.amazonaws:aws-lambda-java-log4j2:1.0.0'
+    )
+}
+
+// http://docs.aws.amazon.com/lambda/latest/dg/create-deployment-pkg-zip-java.html
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    // into('lib') {
+       // from configurations.runtimeClasspath
+    //}
+}
+
+task buildLayer(type: Copy) {
+    into "$buildDir/layer/java/lib"
+    from configurations.runtime
+}
+
+build.dependsOn buildZip, buildLayer
